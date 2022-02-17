@@ -2,21 +2,32 @@ package io.github.phoenixwb.phoenixutils.coordinate;
 
 import java.io.Serializable;
 
+import static io.github.phoenixwb.phoenixutils.ObjectUtil.convertNegative;
+
 /**
- * An Angle in degrees read and interacted with in the same manner as a compass bearing
+ * An Angle in degrees read and interacted with in the same manner as a compass
+ * bearing
+ * 
  * @author Phoenix WB
  */
-public class Angle implements Serializable {
+public class Angle implements Serializable, Comparable<Angle> {
 	private static final long serialVersionUID = 4387821434290856441L;
 	public static final Angle D0 = new Angle(YPlane.NORTH, 90, XPlane.EAST);
 	public static final Angle D90 = new Angle(YPlane.NORTH, 0, XPlane.WEST);
 	public static final Angle D180 = new Angle(YPlane.SOUTH, 90, XPlane.WEST);
 	public static final Angle D270 = new Angle(YPlane.SOUTH, 0, XPlane.EAST);
-	
+
 	public final XPlane xplane;
 	public final YPlane yplane;
 	public final double degrees;
 
+	/**
+	 * Creates a new Angle with the given bearing rotation
+	 * 
+	 * @param yplane  Direction of the y axis
+	 * @param degrees Rotation towards the x axis from the y axis
+	 * @param xplane  Direction of the x axis
+	 */
 	public Angle(YPlane yplane, double degrees, XPlane xplane) {
 		this.yplane = yplane;
 		this.degrees = degrees;
@@ -35,12 +46,13 @@ public class Angle implements Serializable {
 				: (x == XPlane.WEST ? 270 - degrees : 270 + degrees);
 		return deg;
 	}
-	
+
 	/**
 	 * Converts the Degrees True into Radians
+	 * 
 	 * @return Radians
 	 */
-	public double getRadians() {
+	public double getRadiansTrue() {
 		return Math.toRadians(getDegreesTrue());
 	}
 
@@ -51,7 +63,7 @@ public class Angle implements Serializable {
 	 * @return New Angle
 	 */
 	public Angle newAngle(double degrees, boolean clockwise) {
-		double deg = clockwise ? getDegreesTrue() - degrees : getDegreesTrue() + degrees;
+		double deg = clockwise ? convertNegative(getDegreesTrue() - degrees, 360) : getDegreesTrue() + degrees;
 		return Angle.toAngle(deg, false);
 	}
 
@@ -62,14 +74,15 @@ public class Angle implements Serializable {
 	 * @return New Angle
 	 */
 	public Angle newAngle(Angle angle, boolean clockwise) {
-		double deg = clockwise ? getDegreesTrue() - angle.getDegreesTrue() : getDegreesTrue() + angle.getDegreesTrue();
+		double deg = clockwise ? convertNegative(getDegreesTrue() - angle.getDegreesTrue(), 360) : getDegreesTrue() + angle.getDegreesTrue();
 		return Angle.toAngle(deg, false);
 	}
 
 	/**
 	 * Creates a new angle from the inputed Degrees True
 	 * 
-	 * @param degrees Degrees True
+	 * @param degrees   Positive Degrees True
+	 * @param clockwise Direction
 	 * @return New Angle
 	 */
 	public static Angle toAngle(double degrees, boolean clockwise) {
@@ -94,11 +107,27 @@ public class Angle implements Serializable {
 		return new Angle(y, deg, x);
 	}
 
+	@Override
+	public int compareTo(Angle o) {
+		if (getDegreesTrue() < o.getDegreesTrue()) {
+			return -1;
+		}
+		if (getDegreesTrue() > o.getDegreesTrue()) {
+			return 1;
+		}
+		return 0;
+	}
+
 	public static enum YPlane {
 		NORTH, SOUTH;
 	}
 
 	public static enum XPlane {
 		EAST, WEST;
+	}
+	
+	@Override
+	public String toString() {
+		return yplane + " " + degrees + " " + xplane;
 	}
 }

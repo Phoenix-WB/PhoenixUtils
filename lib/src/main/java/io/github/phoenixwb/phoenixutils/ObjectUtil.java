@@ -1,5 +1,7 @@
 package io.github.phoenixwb.phoenixutils;
 
+import io.github.phoenixwb.phoenixutils.functionalinterface.Performer;
+
 public class ObjectUtil {
 	public static <T> boolean is(T obj, T equalTo, Performer per) {
 		if(obj == equalTo) {
@@ -23,5 +25,12 @@ public class ObjectUtil {
 	
 	public static <T> boolean isNull(T obj) {
 		return obj == null;
+	}
+	
+	public static double convertNegative(double val, double range) {
+		if(isNegative(val)) {
+			return ((val % range) + range) % range;
+		}
+		return val;
 	}
 }

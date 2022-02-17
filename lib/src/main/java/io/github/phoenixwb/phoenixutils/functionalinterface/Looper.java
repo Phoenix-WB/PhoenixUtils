@@ -1,4 +1,4 @@
-package io.github.phoenixwb.phoenixutils;
+package io.github.phoenixwb.phoenixutils.functionalinterface;
 
 /**
  * Represents a looper of a function

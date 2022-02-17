@@ -1,4 +1,8 @@
-package io.github.phoenixwb.phoenixutils;
+package io.github.phoenixwb.phoenixutils.functionalinterface;
+
+import java.util.function.Function;
+
+import io.github.phoenixwb.phoenixutils.builder.ListBuilder;
 
 /**
  * Represents a repeater of a function
@@ -28,12 +32,9 @@ public interface Repeater<T> {
 	
 	/**
 	 * Repeats through the inputted arguments
-	 * @param ts Receives each value
+	 * @param ts ListBuilder to loop through
 	 */
-	@SuppressWarnings("unchecked")
-	default void repeat(T... ts) {
-		for(T t : ts) {
-			receive(t);
-		}
+	default void repeat(Function<ListBuilder<T>, ListBuilder<T>> ts) {
+		ts.apply(new ListBuilder<T>()).forEach(this::receive);
 	}
 }

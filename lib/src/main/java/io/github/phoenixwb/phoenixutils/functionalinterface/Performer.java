@@ -1,4 +1,4 @@
-package io.github.phoenixwb.phoenixutils;
+package io.github.phoenixwb.phoenixutils.functionalinterface;
 
 /**
  * Represents a performer of a function

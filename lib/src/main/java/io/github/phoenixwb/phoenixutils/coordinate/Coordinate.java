@@ -2,7 +2,9 @@ package io.github.phoenixwb.phoenixutils.coordinate;
 
 import java.io.Serializable;
 
-import io.github.phoenixwb.phoenixutils.ObjectUtil;
+import static io.github.phoenixwb.phoenixutils.ObjectUtil.isZero;
+import static io.github.phoenixwb.phoenixutils.ObjectUtil.isPositive;
+import static io.github.phoenixwb.phoenixutils.ObjectUtil.isNegative;
 import io.github.phoenixwb.phoenixutils.coordinate.Angle.XPlane;
 import io.github.phoenixwb.phoenixutils.coordinate.Angle.YPlane;
 
@@ -26,10 +28,74 @@ public class Coordinate implements Serializable {
 		this.y = y;
 	}
 
+	/**
+	 * Rotates the coordinate around the given axis the set number of degrees
+	 * 
+	 * @param axis Axis to rotate around
+	 * @param degrees Degrees rotated
+	 * @param clockwise Direction rotated
+	 */
 	public void rotate(Coordinate axis, double degrees, boolean clockwise) {
+		if (isZero(x - axis.x) && isZero(y - axis.y)) {
+			return;
+		}
+
+		Angle newRotation = getRotation(axis).newAngle(degrees, clockwise);
+		double rad = Math.sqrt(Math.pow(x - axis.x, 2) + Math.pow(y - axis.y, 2));
+
+		if (isZero(newRotation.compareTo(Angle.D0))) {
+			this.x = rad + axis.x;
+			this.y = axis.y;
+		}
+
+		if (isZero(newRotation.compareTo(Angle.D90))) {
+			this.x = axis.x;
+			this.y = rad + axis.y;
+		}
+
+		if (isZero(newRotation.compareTo(Angle.D180))) {
+			this.x = -rad + axis.x;
+			this.y = axis.y;
+		}
+
+		if (isZero(newRotation.compareTo(Angle.D270))) {
+			this.x = axis.x;
+			this.y = -rad + axis.y;
+		}
+
+		if (newRotation.yplane == YPlane.NORTH) {
+			if (newRotation.xplane == XPlane.EAST) {
+				this.x = (Math.sin(Math.toRadians(newRotation.degrees)) * rad) + axis.x;
+				this.y = (Math.cos(Math.toRadians(newRotation.degrees)) * rad) + axis.y;
+			}
+
+			if (newRotation.xplane == XPlane.WEST) {
+				this.x = -(Math.sin(Math.toRadians(newRotation.degrees)) * rad) + axis.x;
+				this.y = (Math.cos(Math.toRadians(newRotation.degrees)) * rad) + axis.y;
+			}
+		}
+
+		if (newRotation.yplane == YPlane.SOUTH) {
+			if (newRotation.xplane == XPlane.EAST) {
+				this.x = -(Math.sin(Math.toRadians(newRotation.degrees)) * rad) + axis.x;
+				this.y = -(Math.cos(Math.toRadians(newRotation.degrees)) * rad) + axis.y;
+			}
+
+			if (newRotation.xplane == XPlane.WEST) {
+				this.x = (Math.sin(Math.toRadians(newRotation.degrees)) * rad) + axis.x;
+				this.y = -(Math.cos(Math.toRadians(newRotation.degrees)) * rad) + axis.y;
+			}
+		}
 	}
 
-	public void setRotated(Coordinate axis, double degrees) {
+	public void setRotation(Coordinate axis, Angle angle) {
+		setRotation(axis, angle.getDegreesTrue());
+	}
+
+	public void setRotation(Coordinate axis, double degrees) {
+		if (isZero(x - axis.x) && isZero(y - axis.y)) {
+			return;
+		}
 	}
 
 	/**
@@ -42,31 +108,31 @@ public class Coordinate implements Serializable {
 		double xDif = x - axis.x;
 		double yDif = y - axis.y;
 
-		if (ObjectUtil.isZero(xDif) && ObjectUtil.isZero(yDif)) {
+		if (isZero(xDif) && isZero(yDif)) {
 			return new Angle(null, 0, null);
 		}
 
-		if (ObjectUtil.isZero(xDif)) {
-			return ObjectUtil.isPositive(yDif) ? Angle.D90 : Angle.D270;
+		if (isZero(xDif)) {
+			return isPositive(yDif) ? Angle.D90 : Angle.D270;
 		}
 
-		if (ObjectUtil.isZero(yDif)) {
-			return ObjectUtil.isPositive(xDif) ? Angle.D0 : Angle.D180;
+		if (isZero(yDif)) {
+			return isPositive(xDif) ? Angle.D0 : Angle.D180;
 		}
 
-		if (ObjectUtil.isPositive(xDif) && ObjectUtil.isPositive(yDif)) {
+		if (isPositive(xDif) && isPositive(yDif)) {
 			return new Angle(YPlane.NORTH, 90 - Math.toDegrees(Math.atan(Math.abs(yDif) / Math.abs(xDif))),
 					XPlane.EAST);
 		}
 
-		if (ObjectUtil.isNegative(xDif) && ObjectUtil.isPositive(yDif)) {
+		if (isNegative(xDif) && isPositive(yDif)) {
 			return new Angle(YPlane.NORTH, Math.toDegrees(Math.atan(Math.abs(yDif) / Math.abs(xDif))), XPlane.WEST);
 		}
 
-		if (ObjectUtil.isPositive(xDif) && ObjectUtil.isNegative(yDif)) {
+		if (isPositive(xDif) && isNegative(yDif)) {
 			return new Angle(YPlane.SOUTH, Math.toDegrees(Math.atan(Math.abs(yDif) / Math.abs(xDif))), XPlane.WEST);
 		}
-		
+
 		return new Angle(YPlane.SOUTH, 90 - Math.toDegrees(Math.atan(Math.abs(yDif) / Math.abs(xDif))), XPlane.EAST);
 	}
 }
