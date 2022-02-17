@@ -6,11 +6,22 @@ import java.io.Serializable;
  * An Angle in degrees read and interacted with in the same manner as a compass bearing
  * @author Phoenix WB
  */
-public record Angle(YPlane yplane, double degrees, XPlane xplane) implements Serializable {
+public class Angle implements Serializable {
+	private static final long serialVersionUID = 4387821434290856441L;
 	public static final Angle D0 = new Angle(YPlane.NORTH, 90, XPlane.EAST);
 	public static final Angle D90 = new Angle(YPlane.NORTH, 0, XPlane.WEST);
 	public static final Angle D180 = new Angle(YPlane.SOUTH, 90, XPlane.WEST);
 	public static final Angle D270 = new Angle(YPlane.SOUTH, 0, XPlane.EAST);
+	
+	public final XPlane xplane;
+	public final YPlane yplane;
+	public final double degrees;
+
+	public Angle(YPlane yplane, double degrees, XPlane xplane) {
+		this.yplane = yplane;
+		this.degrees = degrees;
+		this.xplane = xplane;
+	}
 
 	/**
 	 * Converts the angle into Degrees True, from the positive x axis at y = 0
