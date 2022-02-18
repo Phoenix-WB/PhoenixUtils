@@ -2,7 +2,7 @@ package io.github.phoenixwb.phoenixutils.coordinate;
 
 import java.io.Serializable;
 
-import static io.github.phoenixwb.phoenixutils.ObjectUtil.convertNegative;
+import io.github.phoenixwb.phoenixutils.ObjectUtil;
 
 /**
  * An Angle in degrees read and interacted with in the same manner as a compass
@@ -30,7 +30,7 @@ public class Angle implements Serializable, Comparable<Angle> {
 	 */
 	public Angle(YPlane yplane, double degrees, XPlane xplane) {
 		this.yplane = yplane;
-		this.degrees = degrees;
+		this.degrees = ObjectUtil.constrain(degrees, 0, 90);
 		this.xplane = xplane;
 	}
 
@@ -63,7 +63,8 @@ public class Angle implements Serializable, Comparable<Angle> {
 	 * @return New Angle
 	 */
 	public Angle newAngle(double degrees, boolean clockwise) {
-		double deg = clockwise ? convertNegative(getDegreesTrue() - degrees, 360) : getDegreesTrue() + degrees;
+		double deg = clockwise ? ObjectUtil.convertNegative(getDegreesTrue() - degrees, 360)
+				: getDegreesTrue() + degrees;
 		return Angle.toAngle(deg, false);
 	}
 
@@ -74,7 +75,8 @@ public class Angle implements Serializable, Comparable<Angle> {
 	 * @return New Angle
 	 */
 	public Angle newAngle(Angle angle, boolean clockwise) {
-		double deg = clockwise ? convertNegative(getDegreesTrue() - angle.getDegreesTrue(), 360) : getDegreesTrue() + angle.getDegreesTrue();
+		double deg = clockwise ? ObjectUtil.convertNegative(getDegreesTrue() - angle.getDegreesTrue(), 360)
+				: getDegreesTrue() + angle.getDegreesTrue();
 		return Angle.toAngle(deg, false);
 	}
 
@@ -118,16 +120,19 @@ public class Angle implements Serializable, Comparable<Angle> {
 		return 0;
 	}
 
+	/**
+	 * Returns a String representation of this object's bearing
+	 */
+	@Override
+	public String toString() {
+		return yplane + " " + degrees + " " + xplane;
+	}
+
 	public static enum YPlane {
 		NORTH, SOUTH;
 	}
 
 	public static enum XPlane {
 		EAST, WEST;
-	}
-	
-	@Override
-	public String toString() {
-		return yplane + " " + degrees + " " + xplane;
 	}
 }
