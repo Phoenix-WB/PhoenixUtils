@@ -8,3 +8,12 @@ repositories {
 
 dependencies {
 }
+
+version = '0.1.0'
+
+tasks.named('jar') {
+    manifest {
+        attributes('Implementation-Title': project.name,
+                   'Implementation-Version': project.version)
+    }
+}
