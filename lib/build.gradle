@@ -17,7 +17,3 @@ tasks.named('jar') {
                    'Implementation-Version': project.version)
     }
 }
-
-java {
-    withJavadocJar()
-}
